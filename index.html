@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="index.css">
+    <script src="web3.min.js"></script>
+    <!-- <script src="./node_modules/web3/dist/web3.min.js"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script> -->
+</head>
+
+<body>
+    <div id="container">
+        <h1>First Smart Contract</h1>
+        <h2 id="instructor"></h2>
+        <label for="name" class="col-lg-2 control-label">instructor Name</label>
+        <input type="text" id="name">
+        <label for="name" class="col-lg-2 control-label">instructor Age</label>
+        <input type="text" id="age">
+        <button id="button">Update instructor</button>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script>
+        if (typeof web3 !== 'undefined') {
+            web3 = new Web3(web3.currentProvider);
+        }
+        else {
+            //set the provider you want from web3.providers
+            web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+        }
+        web3.eth.defaultAccount = web3.eth.accounts[0];
+        var CoursesContract = web3.eth.contract([
+            {
+                "constant": false,
+                "inputs": [
+                    {
+                        "name": "_fName",
+                        "type": "string"
+                    },
+                    {
+                        "name": "_age",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "setInstructor",
+                "outputs": [],
+                "payable": false,
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "constant": true,
+                "inputs": [],
+                "name": "getInstructor",
+                "outputs": [
+                    {
+                        "name": "",
+                        "type": "string"
+                    },
+                    {
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "payable": false,
+                "stateMutability": "view",
+                "type": "function"
+            }
+        ]);
+        var Courses = CoursesContract.at('0x4e725f19e9c7880fe2d93704c5f25675efcd7950');
+        Courses.setInstructor('Stephen Hawking', 76);
+        Courses.getInstructor();
+        $("#button").click(function () {
+            Courses.setInstructor($("#name").val(), $("#age").val());
+        });
+        Courses.getInstructor(function (error, result) {
+            if (!error) {
+                $("#instructor").html(result[0] + ' (' + result[1] + ' years old)');
+                console.log(result);
+            }
+            else
+                console.error(error);
+        });
+    </script>
+</body>
+
+</html>
